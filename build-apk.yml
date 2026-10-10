@@ -1,0 +1,36 @@
+name: Build Prison Break APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install dependencies
+        run: npm install
+      - name: Add Android platform
+        run: npx cordova platform add android@14.0.1
+      - name: Build debug APK
+        run: npx cordova build android --debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Prison-Break-APK
+          path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
